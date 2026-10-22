@@ -65,7 +65,7 @@ export function writeDemo(page, demo) {
  * Records the sample flow with the real extension. `onStep(i, ok)` is called after each click.
  * Returns the browser, the editor page that opens after recording, and the demo id.
  */
-export async function recordSampleFlow({ headless = !process.env.HEADFUL, onStep = () => {} } = {}) {
+export async function recordSampleFlow({ headless = !process.env.HEADFUL, onStep = () => {}, beforeStart = async () => {}, lang } = {}) {
   const extensionPath = join(root, 'dist/extension');
   if (!existsSync(join(extensionPath, 'manifest.json'))) throw new Error('Run `npm run build` first.');
   const server = await serveSampleApp();
@@ -73,7 +73,13 @@ export async function recordSampleFlow({ headless = !process.env.HEADFUL, onStep
   const browser = await puppeteer.launch({
     headless,
     defaultViewport: null,
-    args: [`--disable-extensions-except=${extensionPath}`, `--load-extension=${extensionPath}`, '--window-size=1280,800', '--hide-scrollbars'],
+    args: [
+      `--disable-extensions-except=${extensionPath}`,
+      `--load-extension=${extensionPath}`,
+      '--window-size=1280,800',
+      '--hide-scrollbars',
+      ...(lang ? [`--lang=${lang}`] : []),
+    ],
   });
   const close = async () => {
     await browser.close();
@@ -90,6 +96,7 @@ export async function recordSampleFlow({ headless = !process.env.HEADFUL, onStep
     const control = await browser.newPage();
     await control.goto(`chrome-extension://${extensionId}/popup.html`);
     const send = (message) => control.evaluate((m) => chrome.runtime.sendMessage(m), message);
+    await beforeStart({ control, app });
     const tabId = await control.evaluate(async (url) => (await chrome.tabs.query({})).find((t) => t.url?.startsWith(url))?.id, appUrl);
     await send({ type: 'start', tabId });
     await app.bringToFront();
@@ -104,7 +111,7 @@ export async function recordSampleFlow({ headless = !process.env.HEADFUL, onStep
     };
     for (const [i, [selector, text]] of FLOW.entries()) {
       await app.click(selector);
-      onStep(i, await waitForSteps(i + 1), selector);
+      await onStep(i, await waitForSteps(i + 1), selector, app);
       if (text) await app.type(selector, text, { delay: 20 });
       await sleep(900); // let the page settle so the next click uses a fresh frame
     }

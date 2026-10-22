@@ -19,7 +19,29 @@ mkdirSync(join(root, 'public/sample'), { recursive: true });
 mkdirSync(join(root, 'docs'), { recursive: true });
 
 console.log('Recording…');
-const { editor, demoId, close } = await recordSampleFlow();
+const { editor, demoId, close } = await recordSampleFlow({
+  // The toolbar popup, before recording starts.
+  lang: 'en-US',
+  beforeStart: async ({ control, app }) => {
+    // Reload the popup while the sample app is the active tab, so it offers to record it.
+    await app.bringToFront();
+    await control.emulateMediaFeatures([{ name: 'prefers-color-scheme', value: 'light' }]);
+    await control.setViewport({ width: 300, height: 300, deviceScaleFactor: 2 });
+    await control.reload();
+    await sleep(500);
+    const box = await control.$eval('main', (el) => {
+      const r = el.getBoundingClientRect();
+      return { x: r.x, y: r.y, width: r.width, height: r.height };
+    });
+    await control.screenshot({ path: join(root, 'docs/popup.png'), clip: box });
+  },
+  // The page while recording, with the "Recording" pill in the corner.
+  onStep: async (i, ok, selector, app) => {
+    if (i !== 0) return;
+    await sleep(1600);
+    await app.screenshot({ path: join(root, 'docs/recording.png') });
+  },
+});
 
 try {
   // ---- Polish the recorded demo ----
@@ -66,6 +88,22 @@ try {
     await editor.screenshot({ path: join(root, `docs/editor-${scheme}.png`) });
   }
   await editor.emulateMediaFeatures([{ name: 'prefers-color-scheme', value: 'light' }]);
+
+  // ---- chrome://extensions with Developer mode on and Stepcast loaded ----
+  const extensionsPage = await editor.browser().newPage();
+  await extensionsPage.setViewport({ width: 1100, height: 560 });
+  await extensionsPage.emulateMediaFeatures([{ name: 'prefers-color-scheme', value: 'light' }]);
+  await extensionsPage.goto('chrome://extensions');
+  await sleep(800);
+  await extensionsPage.evaluate(() => {
+    const toolbar = document.querySelector('extensions-manager').shadowRoot.querySelector('extensions-toolbar');
+    const toggle = toolbar.shadowRoot.querySelector('#devMode');
+    if (!toggle.checked) toggle.click();
+  });
+  await sleep(800);
+  await extensionsPage.screenshot({ path: join(root, 'docs/install.png') });
+  await extensionsPage.close();
+  await editor.bringToFront();
 
   // ---- Export ----
   const cdp = await editor.createCDPSession();
