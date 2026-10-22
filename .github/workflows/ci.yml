@@ -18,6 +18,9 @@ jobs:
       - run: npm run typecheck
       - run: npm test
       - run: npm run build
+      # Ubuntu 24.04 blocks the user namespaces Chrome's sandbox needs; allow them instead of disabling the sandbox.
+      - name: Allow Chrome's sandbox
+        run: sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
       - name: End-to-end test with the real extension
         run: npm run e2e
       - uses: actions/upload-artifact@v7
