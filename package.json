@@ -1,0 +1,51 @@
+{
+  "name": "stepcast",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Open-source interactive product demos. Record clicks with a Chrome extension, edit in the browser, export a single HTML file you can host anywhere.",
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "npm run build:web && npm run build:extension",
+    "build:web": "vite build",
+    "build:extension": "node scripts/build-extension.mjs",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "e2e": "node scripts/e2e.mjs",
+    "showcase": "node scripts/showcase.mjs && python scripts/make-gif.py 760"
+  },
+  "dependencies": {
+    "fflate": "^0.8.3",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1"
+  },
+  "devDependencies": {
+    "@types/chrome": "^0.3.6",
+    "@types/node": "^26.6.5",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "@vitejs/plugin-react": "^6.1.2",
+    "happy-dom": "^21.0.4",
+    "puppeteer": "^25.16.0",
+    "typescript": "^7.0.2",
+    "vite": "^8.3.5",
+    "vitest": "^5.0.5"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Arda-dd/stepcast.git"
+  },
+  "homepage": "https://arda-dd.github.io/stepcast/",
+  "author": "Arda-dd",
+  "keywords": [
+    "interactive-demo",
+    "product-tour",
+    "chrome-extension",
+    "arcade-alternative",
+    "supademo-alternative",
+    "storylane-alternative",
+    "screenshots",
+    "walkthrough"
+  ]
+}

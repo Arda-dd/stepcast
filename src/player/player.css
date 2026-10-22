@@ -1,0 +1,101 @@
+:host {
+  all: initial;
+  display: block;
+  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --sc-color: #6d5efc;
+  --sc-on-color: #fff;
+  --sc-radius: 14px;
+}
+* { box-sizing: border-box; }
+.root {
+  position: relative;
+  outline: none;
+  border-radius: var(--sc-radius);
+  overflow: hidden;
+  background: #0f1115;
+  box-shadow: 0 1px 2px rgba(0,0,0,.08), 0 12px 40px rgba(15,17,21,.18);
+}
+.root:focus-visible { box-shadow: 0 0 0 3px var(--sc-color); }
+.stage { position: relative; width: 100%; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+.frame { position: relative; overflow: hidden; }
+.zoomer {
+  position: absolute; inset: 0;
+  transform-origin: 50% 50%;
+  transition: transform 700ms cubic-bezier(.22,.8,.24,1);
+  will-change: transform;
+}
+.shot { position: absolute; inset: 0; width: 100%; height: 100%; display: block; user-select: none; -webkit-user-drag: none; }
+
+/* A ring with a see-through middle, so the label under the click stays readable. */
+.hotspot {
+  position: absolute; width: 30px; height: 30px; margin: -15px 0 0 -15px;
+  padding: 0; border-radius: 50%; cursor: pointer;
+  border: 3px solid var(--sc-color);
+  background: color-mix(in srgb, var(--sc-color) 22%, transparent);
+  box-shadow: 0 0 0 2px rgba(255,255,255,.95), 0 4px 14px rgba(0,0,0,.3);
+  transition: transform 160ms ease;
+}
+.hotspot:hover { transform: scale(1.12); }
+.hotspot:focus-visible { outline: 3px solid #fff; outline-offset: 3px; }
+.hotspot::before, .hotspot::after {
+  content: ""; position: absolute; inset: -3px; border-radius: 50%;
+  border: 2px solid var(--sc-color); opacity: .7; animation: sc-pulse 1.8s ease-out infinite;
+}
+.hotspot::after { animation-delay: .9s; }
+@keyframes sc-pulse { from { transform: scale(1); opacity: .7; } to { transform: scale(2.6); opacity: 0; } }
+
+.tip {
+  position: absolute; z-index: 2; width: min(320px, 78%);
+  background: #fff; color: #15171c; border-radius: 12px; padding: 14px 16px 12px;
+  box-shadow: 0 10px 30px rgba(0,0,0,.28);
+  font-size: 15px; line-height: 1.45;
+  animation: sc-in 260ms cubic-bezier(.22,.8,.24,1) both;
+}
+.tip::before {
+  content: ""; position: absolute; left: var(--arrow, 50%); width: 14px; height: 14px; margin-left: -7px;
+  background: #fff; transform: rotate(45deg); border-radius: 2px;
+}
+.tip.below::before { top: -6px; }
+.tip.above::before { bottom: -6px; }
+.tip.center { left: 50% !important; top: 50% !important; transform: translate(-50%, -50%); animation-name: sc-in-center; }
+.tip.center::before { display: none; }
+.text { margin: 0 0 12px; white-space: pre-wrap; overflow-wrap: anywhere; }
+.nav { display: flex; align-items: center; gap: 8px; }
+.count { font-size: 12px; color: #6b7280; margin-right: auto; font-variant-numeric: tabular-nums; }
+button.btn {
+  font: inherit; font-size: 13px; font-weight: 600; border-radius: 8px; padding: 7px 12px; cursor: pointer;
+  border: 1px solid #e3e5ea; background: #fff; color: #15171c;
+}
+button.btn:hover { background: #f4f5f7; }
+button.btn.primary { background: var(--sc-color); border-color: transparent; color: var(--sc-on-color); }
+button.btn.primary:hover { filter: brightness(1.08); }
+button.btn:focus-visible { outline: 2px solid var(--sc-color); outline-offset: 2px; }
+@keyframes sc-in { from { opacity: 0; transform: translateY(6px); } }
+@keyframes sc-in-center { from { opacity: 0; transform: translate(-50%, calc(-50% + 6px)); } }
+
+.end {
+  position: absolute; inset: 0; z-index: 3; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px;
+  background: rgba(15,17,21,.72); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+  color: #fff; text-align: center; padding: 24px; animation: sc-fade 300ms ease both;
+}
+.end[hidden] { display: none; }
+.end h2 { margin: 0; font-size: clamp(18px, 3vw, 26px); font-weight: 700; letter-spacing: -.01em; }
+.end .row { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
+.end a.btn { text-decoration: none; display: inline-block; font-size: 14px; font-weight: 600; border-radius: 8px; padding: 9px 16px; background: var(--sc-color); color: var(--sc-on-color); }
+.end button.btn { background: rgba(255,255,255,.12); color: #fff; border-color: rgba(255,255,255,.25); font-size: 14px; padding: 9px 16px; }
+@keyframes sc-fade { from { opacity: 0; } }
+
+.progress { height: 4px; background: rgba(255,255,255,.12); }
+.progress[hidden] { display: none; }
+.progress span { display: block; height: 100%; width: 0; background: var(--sc-color); transition: width 400ms ease; }
+
+.empty { color: #9aa3ae; padding: 48px 16px; text-align: center; font-size: 14px; }
+
+@media (max-width: 480px) {
+  .tip { font-size: 13px; padding: 10px 12px 9px; width: min(260px, 86%); }
+  .hotspot { width: 24px; height: 24px; margin: -12px 0 0 -12px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .zoomer { transition: none; }
+  .hotspot::before, .hotspot::after, .tip, .end { animation: none; }
+}

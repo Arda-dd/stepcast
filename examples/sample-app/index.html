@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Orbit – Projects</title>
+<style>
+  :root { --bg: #f7f7fb; --surface: #fff; --text: #16181d; --muted: #6b7180; --border: #e6e7ee; --accent: #4f46e5; --accent-soft: #eef0ff; --green: #16a34a; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text); font: 14px/1.5 ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+  .app { display: grid; grid-template-columns: 232px 1fr; min-height: 100vh; }
+  aside { background: var(--surface); border-right: 1px solid var(--border); padding: 20px 14px; display: flex; flex-direction: column; gap: 4px; }
+  .brand { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 17px; padding: 0 8px 18px; }
+  .brand i { width: 28px; height: 28px; border-radius: 8px; background: conic-gradient(from 200deg, #4f46e5, #06b6d4, #4f46e5); display: block; }
+  nav a { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 8px; color: var(--muted); text-decoration: none; font-weight: 500; }
+  nav a.on { background: var(--accent-soft); color: var(--accent); font-weight: 600; }
+  .side-foot { margin-top: auto; display: flex; align-items: center; gap: 10px; padding: 10px; border-top: 1px solid var(--border); }
+  .avatar { width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; color: #fff; font-weight: 700; font-size: 12px; }
+  main { padding: 28px 36px; }
+  header { display: flex; align-items: center; gap: 12px; margin-bottom: 24px; }
+  h1 { font-size: 24px; margin: 0; letter-spacing: -.01em; }
+  .search { margin-left: auto; width: 260px; border: 1px solid var(--border); background: var(--surface); border-radius: 10px; padding: 9px 12px; color: var(--muted); }
+  .btn { border: 0; border-radius: 10px; padding: 10px 16px; font: inherit; font-weight: 600; cursor: pointer; background: var(--accent); color: #fff; box-shadow: 0 1px 2px rgba(79,70,229,.3); }
+  .btn.secondary { background: var(--surface); color: var(--text); border: 1px solid var(--border); box-shadow: none; }
+  .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 24px; }
+  .stat { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 16px 18px; }
+  .stat b { display: block; font-size: 24px; letter-spacing: -.02em; }
+  .stat span { color: var(--muted); font-size: 13px; }
+  .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  .project { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 18px; cursor: pointer; transition: box-shadow .15s, transform .15s; }
+  .project:hover { box-shadow: 0 8px 24px rgba(22,24,29,.08); transform: translateY(-1px); }
+  .project h3 { margin: 10px 0 4px; font-size: 16px; }
+  .project p { margin: 0; color: var(--muted); font-size: 13px; }
+  .tag { display: inline-block; font-size: 12px; font-weight: 600; padding: 3px 8px; border-radius: 999px; background: var(--accent-soft); color: var(--accent); }
+  .tag.new { background: #dcfce7; color: var(--green); }
+  .bar { height: 6px; border-radius: 3px; background: var(--border); margin-top: 14px; overflow: hidden; }
+  .bar span { display: block; height: 100%; background: var(--accent); border-radius: 3px; }
+  .people { display: flex; margin-top: 12px; }
+  .people .avatar { width: 26px; height: 26px; font-size: 11px; border: 2px solid var(--surface); margin-right: -6px; }
+  .modal-bg { position: fixed; inset: 0; background: rgba(22,24,29,.45); display: none; align-items: center; justify-content: center; }
+  .modal-bg.open { display: flex; }
+  .modal { background: var(--surface); border-radius: 16px; width: 440px; padding: 24px; box-shadow: 0 30px 80px rgba(0,0,0,.25); }
+  .modal h2 { margin: 0 0 4px; font-size: 18px; }
+  .modal p { margin: 0 0 18px; color: var(--muted); }
+  label { display: block; font-weight: 600; font-size: 13px; margin: 0 0 6px; }
+  input, select { width: 100%; border: 1px solid var(--border); border-radius: 10px; padding: 10px 12px; font: inherit; margin-bottom: 14px; background: var(--surface); }
+  input:focus, select:focus { outline: 2px solid var(--accent-soft); border-color: var(--accent); }
+  .actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 6px; }
+  .detail { display: none; }
+  .detail.open { display: block; }
+  .crumb { color: var(--muted); margin-bottom: 6px; }
+  .panel { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 20px; margin-top: 20px; }
+  .member { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--border); }
+  .member:last-child { border-bottom: 0; }
+  .member div { flex: 1; }
+  .member small { color: var(--muted); }
+  .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); background: #16181d; color: #fff; padding: 10px 16px; border-radius: 10px; font-weight: 600; display: none; }
+  .toast.show { display: block; }
+</style>
+</head>
+<body>
+<div class="app">
+  <aside>
+    <div class="brand"><i></i>Orbit</div>
+    <nav>
+      <a href="#" class="on">▦ Projects</a>
+      <a href="#">◷ Timeline</a>
+      <a href="#">☰ Tasks</a>
+      <a href="#">◔ Reports</a>
+      <a href="#">⚙ Settings</a>
+    </nav>
+    <div class="side-foot"><span class="avatar" style="background:#4f46e5">MK</span><div><b>Maya Kaya</b><br><small style="color:var(--muted)">maya.kaya@orbit.app</small></div></div>
+  </aside>
+
+  <main>
+    <section id="list">
+      <header>
+        <h1>Projects</h1>
+        <div class="search">Search projects…</div>
+        <button class="btn" id="new-project">+ New project</button>
+      </header>
+      <div class="stats">
+        <div class="stat"><b id="count">3</b><span>Active projects</span></div>
+        <div class="stat"><b>18</b><span>Tasks due this week</span></div>
+        <div class="stat"><b>92%</b><span>On-time delivery</span></div>
+      </div>
+      <div class="grid" id="projects">
+        <div class="project"><span class="tag">Design</span><h3>Website redesign</h3><p>Marketing site refresh for Q4</p><div class="bar"><span style="width:72%"></span></div><div class="people"><span class="avatar" style="background:#ec4899">AL</span><span class="avatar" style="background:#06b6d4">JS</span><span class="avatar" style="background:#f59e0b">TR</span></div></div>
+        <div class="project"><span class="tag">Engineering</span><h3>Mobile app 2.0</h3><p>Offline mode and new onboarding</p><div class="bar"><span style="width:45%"></span></div><div class="people"><span class="avatar" style="background:#10b981">OK</span><span class="avatar" style="background:#4f46e5">MK</span></div></div>
+        <div class="project"><span class="tag">Marketing</span><h3>Product launch</h3><p>Launch plan, press kit and webinars</p><div class="bar"><span style="width:20%"></span></div><div class="people"><span class="avatar" style="background:#f43f5e">EB</span><span class="avatar" style="background:#8b5cf6">DN</span></div></div>
+      </div>
+    </section>
+
+    <section id="detail" class="detail">
+      <div class="crumb">Projects / <span id="detail-name"></span></div>
+      <header>
+        <h1 id="detail-title"></h1>
+        <button class="btn secondary" style="margin-left:auto">Share</button>
+        <button class="btn" id="invite">Invite teammates</button>
+      </header>
+      <div class="panel">
+        <h3 style="margin:0 0 6px">Team</h3>
+        <div id="members">
+          <div class="member"><span class="avatar" style="background:#4f46e5">MK</span><div><b>Maya Kaya</b><br><small>maya.kaya@orbit.app · Owner</small></div></div>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<div class="modal-bg" id="create-modal">
+  <div class="modal" role="dialog" aria-labelledby="create-title">
+    <h2 id="create-title">Create a project</h2>
+    <p>Projects keep your team's tasks, files and timeline together.</p>
+    <label for="project-name">Project name</label>
+    <input id="project-name" placeholder="e.g. Customer portal" autocomplete="off">
+    <label for="template">Template</label>
+    <select id="template"><option>Product launch</option><option>Software project</option><option>Blank</option></select>
+    <div class="actions"><button class="btn secondary" id="cancel">Cancel</button><button class="btn" id="create">Create project</button></div>
+  </div>
+</div>
+
+<div class="modal-bg" id="invite-modal">
+  <div class="modal" role="dialog" aria-labelledby="invite-title">
+    <h2 id="invite-title">Invite teammates</h2>
+    <p>They will get an email with a link to join this project.</p>
+    <label for="invite-email">Email address</label>
+    <input id="invite-email" placeholder="name@company.com" autocomplete="off">
+    <div class="actions"><button class="btn secondary" id="invite-cancel">Cancel</button><button class="btn" id="send-invite">Send invite</button></div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+  const $ = (id) => document.getElementById(id);
+  const toast = (text) => { $('toast').textContent = text; $('toast').classList.add('show'); setTimeout(() => $('toast').classList.remove('show'), 2200); };
+  $('new-project').onclick = () => { $('create-modal').classList.add('open'); setTimeout(() => $('project-name').focus(), 50); };
+  $('cancel').onclick = () => $('create-modal').classList.remove('open');
+  $('create').onclick = () => {
+    const name = $('project-name').value.trim() || 'Untitled project';
+    const card = document.createElement('div');
+    card.className = 'project';
+    card.id = 'new-card';
+    card.innerHTML = '<span class="tag new">New</span><h3></h3><p>Created just now</p><div class="bar"><span style="width:4%"></span></div><div class="people"><span class="avatar" style="background:#4f46e5">MK</span></div>';
+    card.querySelector('h3').textContent = name;
+    card.onclick = () => {
+      $('list').style.display = 'none';
+      $('detail').classList.add('open');
+      $('detail-name').textContent = name;
+      $('detail-title').textContent = name;
+    };
+    $('projects').prepend(card);
+    $('count').textContent = String($('projects').children.length);
+    $('create-modal').classList.remove('open');
+    toast('Project created');
+  };
+  $('invite').onclick = () => { $('invite-modal').classList.add('open'); setTimeout(() => $('invite-email').focus(), 50); };
+  $('invite-cancel').onclick = () => $('invite-modal').classList.remove('open');
+  $('send-invite').onclick = () => {
+    const email = $('invite-email').value.trim() || 'teammate@company.com';
+    const row = document.createElement('div');
+    row.className = 'member';
+    row.innerHTML = '<span class="avatar" style="background:#10b981">' + email.slice(0, 2).toUpperCase() + '</span><div><b></b><br><small>Invitation sent</small></div>';
+    row.querySelector('b').textContent = email;
+    $('members').append(row);
+    $('invite-modal').classList.remove('open');
+    toast('Invitation sent to ' + email);
+  };
+</script>
+</body>
+</html>

@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Stepcast</title>
+<style>
+  :root { color-scheme: light dark; --bg: #fff; --text: #15171c; --muted: #6b7280; --border: #e3e5ea; --accent: #6d5efc; --red: #e5484d; }
+  @media (prefers-color-scheme: dark) { :root { --bg: #17191e; --text: #eceef2; --muted: #9aa3ae; --border: #2c3038; } }
+  * { box-sizing: border-box; }
+  body { margin: 0; width: 300px; background: var(--bg); color: var(--text); font: 14px/1.45 ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+  main { padding: 16px; display: grid; gap: 12px; }
+  header { display: flex; align-items: center; gap: 10px; }
+  .logo { width: 28px; height: 28px; border-radius: 8px; background: var(--accent); display: grid; place-items: center; color: #fff; font-weight: 800; }
+  h1 { font-size: 15px; margin: 0; }
+  p { margin: 0; color: var(--muted); font-size: 13px; }
+  button { font: inherit; font-weight: 600; border-radius: 10px; padding: 10px 12px; border: 1px solid var(--border); background: transparent; color: var(--text); cursor: pointer; width: 100%; }
+  button:hover:not(:disabled) { background: color-mix(in srgb, var(--text) 6%, transparent); }
+  button.primary { background: var(--accent); border-color: transparent; color: #fff; }
+  button.primary:hover:not(:disabled) { filter: brightness(1.08); background: var(--accent); }
+  button.stop { background: var(--red); border-color: transparent; color: #fff; }
+  button:disabled { opacity: .5; cursor: not-allowed; }
+  .rec { display: flex; align-items: center; gap: 8px; font-weight: 600; }
+  .dot { width: 9px; height: 9px; border-radius: 50%; background: var(--red); animation: b 1.2s ease-in-out infinite; }
+  @keyframes b { 50% { opacity: .35; } }
+  .row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  [hidden] { display: none !important; }
+</style>
+</head>
+<body>
+<main>
+  <header><div class="logo">▶</div><h1>Stepcast</h1></header>
+
+  <section id="idle" hidden>
+    <p id="hint">Click through your product. Every click becomes a step of an interactive demo.</p>
+    <div style="height:10px"></div>
+    <button id="start" class="primary" type="button">Start recording this tab</button>
+  </section>
+
+  <section id="recording" hidden>
+    <div class="rec"><span class="dot"></span><span id="status">Recording</span></div>
+    <div style="height:10px"></div>
+    <div class="row">
+      <button id="discard" type="button">Discard</button>
+      <button id="stop" class="stop" type="button">Stop &amp; edit</button>
+    </div>
+  </section>
+
+  <button id="library" type="button">Open my demos</button>
+</main>
+<script type="module" src="./popup.ts"></script>
+</body>
+</html>
